@@ -1,20 +1,17 @@
-function createRipple(event) {
-	const button = event.currentTarget;
+function createRipple({ currentTarget: button, clientX, clientY }) {
+	const ripple = document.createElement("span"),
+		{ style } = ripple,
+		diameter = Math.max(button.clientWidth, button.clientHeight),
+		radius = diameter / 2;
 
-	const circle = document.createElement("span");
-	const diameter = Math.max(button.clientWidth, button.clientHeight);
-	const radius = diameter / 2;
+	style.width = style.height = `${diameter}px`;
+	style.left = `${clientX - button.offsetLeft - radius}px`;
+	style.top = `${clientY - button.offsetTop - radius}px`;
+	ripple.classList.add("ripple");
 
-	circle.style.width = circle.style.height = `${diameter}px`;
-	circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
-	circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
-	circle.classList.add("ripple");
+	setTimeout(() => ripple.remove(), 600);
 
-	const ripple = button.getElementsByClassName("ripple")[0];
-
-	if (ripple) ripple.remove();
-
-	button.appendChild(circle);
+	button.appendChild(ripple);
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -22,12 +19,15 @@ document.addEventListener("DOMContentLoaded", function() {
 		button.onclick = createRipple;
 
 	// Rotate background gradient
-	const background = document.getElementById("title");
+	const { style } = document.getElementById("about"),
+		{ requestAnimationFrame: animate } = window;
 	let deg = 62;
-	setInterval(function() {
-		deg += 4;
+	const rotate = () => {
+		deg += 0.5;
 		if (deg >= 360)
 			deg = 0;
-		background.style.backgroundImage = `linear-gradient(${deg}deg, #3a3d40 0, #181719 100%)`;
-	}, 100);
+		style.backgroundImage = `linear-gradient(${deg}deg, #3a3d40 0, #181719 100%)`;
+		animate(rotate);
+	};
+	animate(rotate);	
 });
